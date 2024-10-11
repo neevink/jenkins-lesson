@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        GITHUB_TOKEN = credentials('github-web-hook')  // Сохраните ваш GitHub токен как креденшнл в Jenkins
-        REPO_NAME = 'neevink/jenkins-lesson'
-    }
-
     stages {
         stage('git gheckout') {
             steps {
@@ -30,20 +25,27 @@ pipeline {
         success {
             script {
                 // Установка статуса commit в GitHub как 'success'
-                def commitSha = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-                sh """curl -X POST https://api.github.com/repos/${env.REPO_NAME}/statuses/${commitSha} \
-                      -H "Authorization: token ${env.GITHUB_TOKEN}" \
-                      -d '{"state": "success", "context": "CI Tests", "description": "All checks passed", "target_url": "${env.BUILD_URL}"}'"""
+                setGitHubStatus('success', 'All checks passed')
             }
         }
         failure {
             script {
                 // Установка статуса commit в GitHub как 'failure'
-                def commitSha = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-                sh """curl -X POST https://api.github.com/repos/${env.REPO_NAME}/statuses/${commitSha} \
-                      -H "Authorization: token ${env.GITHUB_TOKEN}" \
-                      -d '{"state": "failure", "context": "CI Tests", "description": "Checks failed", "target_url": "${env.BUILD_URL}"}'"""
+                setGitHubStatus('failure', 'Tests failed')
             }
         }
+    }
+}
+
+
+def setGitHubStatus(String state, String description) {
+    def commitSha = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+    def repoName = env.GIT_URL.split('/').dropRight(1).last().replaceAll('.git', '')
+    def apiUrl = "https://api.github.com/repos/${repoName}/statuses/${commitSha}"
+
+    withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+        sh """curl -X POST ${apiUrl} \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
+              -d '{"state": "${state}", "context": "CI Tests", "description": "${description}", "target_url": "${env.BUILD_URL}"}'"""
     }
 }
