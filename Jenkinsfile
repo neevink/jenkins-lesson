@@ -1,6 +1,15 @@
 pipeline {
     agent any
 
+    triggers {
+        githubPush()
+    }
+
+    environment {
+        GIT_REPO = 'git@github.com:neevink/jenkins-lesson.git'
+    }
+
+
     stages {
         stage('git gheckout') {
             steps {
