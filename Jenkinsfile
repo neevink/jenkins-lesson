@@ -14,10 +14,10 @@ pipeline {
                 // Устанавливаем зависимости
                 // sh 'pip install flake8 pytest'
                 sh 'ls -la'
-                sh 'which pip3'
-                sh 'which pip'
-                sh 'which python'
-                sh 'which python3'
+                sh 'which pip3 || true'
+                sh 'which pip || true'
+                sh 'which python || true'
+                sh 'which python3 || true'
             }
         }
 
