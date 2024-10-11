@@ -23,7 +23,6 @@ pipeline {
 
     post {
         always {
-            // Убираем временные файлы
             cleanWs()
         }
     }
