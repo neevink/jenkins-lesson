@@ -34,5 +34,32 @@ pipeline {
         always {
             cleanWs()
         }
-    }
-}
+        success {
+            script {
+                updateGitHubCommitStatus(currentBuild, 'success')
+            }
+           }
+           failure {
+               script {
+                   updateGitHubCommitStatus(currentBuild, 'failure')
+               }
+           }
+       }
+   }
+
+   def updateGitHubCommitStatus(currentBuild, status) {
+       def commitSha = env.GIT_COMMIT ?: env.GIT_COMMIT
+       def context = 'CI Tests'
+       def description = (status == 'success') ? 'All checks passed' : 'Checks failed'
+       def targetUrl = "${env.BUILD_URL}"
+
+       step([
+           $class: 'GitHubCommitStatusSetter',
+           contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: context],
+           commitShaSource: [$class: 'ManuallyEnteredShaSource', sha: commitSha],
+           errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
+           statusResultSource: [$class: 'ConditionalStatusResultSource', results: [
+               [$class: 'AnyBuildResult', state: status, message: description, url: targetUrl]
+           ]]
+       ])
+   }
