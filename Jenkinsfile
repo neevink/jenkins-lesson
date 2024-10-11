@@ -21,6 +21,7 @@ pipeline {
             steps {
                 // Запускаем линтер flake8
                 // sh 'flake8 .'
+                echo lint
             }
         }
 
@@ -28,6 +29,7 @@ pipeline {
             steps {
                 // Запускаем тесты с помощью pytest
                 // sh 'pytest'
+                echo test
             }
         }
     }
