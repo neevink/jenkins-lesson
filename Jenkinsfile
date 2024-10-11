@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         GITHUB_TOKEN = credentials('github-web-hook')  // Сохраните ваш GitHub токен как креденшнл в Jenkins
-        REPO_NAME = 'jenkins-lesson'
+        REPO_NAME = 'neevink/jenkins-lesson'
     }
 
     stages {
