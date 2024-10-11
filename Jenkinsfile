@@ -1,14 +1,10 @@
 pipeline {
     agent any
 
-    triggers {
-        githubPush()
-    }
-
     environment {
-        GIT_REPO = 'git@github.com:neevink/jenkins-lesson.git'
+        GITHUB_TOKEN = credentials('github-web-hook')  // Сохраните ваш GitHub токен как креденшнл в Jenkins
+        REPO_NAME = 'jenkins-lesson'
     }
-
 
     stages {
         stage('git gheckout') {
@@ -31,35 +27,23 @@ pipeline {
     }
 
     post {
-        always {
-            cleanWs()
-        }
         success {
             script {
-                updateGitHubCommitStatus(currentBuild, 'success')
+                // Установка статуса commit в GitHub как 'success'
+                def commitSha = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                sh """curl -X POST https://api.github.com/repos/${env.REPO_NAME}/statuses/${commitSha} \
+                      -H "Authorization: token ${env.GITHUB_TOKEN}" \
+                      -d '{"state": "success", "context": "CI Tests", "description": "All checks passed", "target_url": "${env.BUILD_URL}"}'"""
             }
-           }
-           failure {
-               script {
-                   updateGitHubCommitStatus(currentBuild, 'failure')
-               }
-           }
-       }
-   }
-
-   def updateGitHubCommitStatus(currentBuild, status) {
-       def commitSha = env.GIT_COMMIT ?: env.GIT_COMMIT
-       def context = 'CI Tests'
-       def description = (status == 'success') ? 'All checks passed' : 'Checks failed'
-       def targetUrl = "${env.BUILD_URL}"
-
-       step([
-           $class: 'GitHubCommitStatusSetter',
-           contextSource: [$class: 'ManuallyEnteredCommitContextSource', context: context],
-           commitShaSource: [$class: 'ManuallyEnteredShaSource', sha: commitSha],
-           errorHandlers: [[$class: 'ShallowAnyErrorHandler']],
-           statusResultSource: [$class: 'ConditionalStatusResultSource', results: [
-               [$class: 'AnyBuildResult', state: status, message: description, url: targetUrl]
-           ]]
-       ])
-   }
+        }
+        failure {
+            script {
+                // Установка статуса commit в GitHub как 'failure'
+                def commitSha = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                sh """curl -X POST https://api.github.com/repos/${env.REPO_NAME}/statuses/${commitSha} \
+                      -H "Authorization: token ${env.GITHUB_TOKEN}" \
+                      -d '{"state": "failure", "context": "CI Tests", "description": "Checks failed", "target_url": "${env.BUILD_URL}"}'"""
+            }
+        }
+    }
+}
