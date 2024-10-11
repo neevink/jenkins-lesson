@@ -14,6 +14,10 @@ pipeline {
                 // Устанавливаем зависимости
                 // sh 'pip install flake8 pytest'
                 sh 'ls -la'
+                sh 'which pip3'
+                sh 'which pip'
+                sh 'which python'
+                sh 'which python3'
             }
         }
 
@@ -21,7 +25,7 @@ pipeline {
             steps {
                 // Запускаем линтер flake8
                 // sh 'flake8 .'
-                echo lint
+                echo 'lint'
             }
         }
 
@@ -29,7 +33,7 @@ pipeline {
             steps {
                 // Запускаем тесты с помощью pytest
                 // sh 'pytest'
-                echo test
+                echo 'test'
             }
         }
     }
