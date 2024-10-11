@@ -2,34 +2,21 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('git gheckout') {
             steps {
-                // Забираем код из системы контроля версий
                 checkout scm
             }
         }
 
-        stage('Install Dependencies') {
+        stage('unit-test') {
             steps {
-                // Устанавливаем зависимости
-                // sh 'pip install flake8 pytest'
-                sh 'python3 -m pip install flake8 pytest'
+                sh 'python3 ./test_app.py'
             }
         }
 
-        stage('Lint') {
+        stage('smoke-test') {
             steps {
-                // Запускаем линтер flake8
-                // sh 'flake8 .'
-                echo 'lint'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                // Запускаем тесты с помощью pytest
-                // sh 'pytest'
-                echo 'test'
+                sh 'python3 ./app.py 2 3'
             }
         }
     }
