@@ -50,7 +50,7 @@ def setGitHubStatus(String state, String description) {  // функция от�
 
     withCredentials([string(credentialsId: 'github-web-hook', variable: 'GITHUB_TOKEN')]) {
         sh """curl -X POST ${apiUrl} \
-              -H "Authorization: token $GITHUB_TOKEN" \
+              -H "Authorization: token ${GITHUB_TOKEN}" \
               -d '{"state": "${state}", "context": "CI Tests", "description": "${description}", "target_url": "${env.BUILD_URL}"}'"""
     }
 }
