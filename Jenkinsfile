@@ -26,9 +26,6 @@ pipeline {
     }
 
     post {
-        always {
-            cleanWs()
-        }
         success {
             script {
                 // Установка статуса commit в GitHub как 'success'
