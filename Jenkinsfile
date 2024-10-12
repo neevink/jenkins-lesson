@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        GITHUB_TOKEN = credentials('github-token')  // Сохраните ваш GitHub токен как креденшнл в Jenkins
+    }
+
     stages {
         stage('git gheckout') {
             steps {
