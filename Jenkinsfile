@@ -40,8 +40,9 @@ pipeline {
 
 def setGitHubStatus(String state, String description) {
     def commitSha = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-    def repoName = env.GIT_URL.split('/').dropRight(1).last().replaceAll('.git', '')
-    def apiUrl = "https://api.github.com/repos/${repoName}/statuses/${commitSha}"
+    def repoName = env.GIT_URL.tokenize('/').last().replace('.git', '')
+    def owner = env.GIT_URL.tokenize('/')[env.GIT_URL.tokenize('/').size()-2]
+    def apiUrl = "https://api.github.com/repos/${owner}/${repoName}/statuses/${commitSha}"
 
     withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
         sh """curl -X POST ${apiUrl} \
