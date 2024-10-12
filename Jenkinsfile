@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GITHUB_TOKEN = credentials('github-token')  // Сохраните ваш GitHub токен как креденшнл в Jenkins
+        GITHUB_TOKEN = credentials('github-web-hook')  // Сохраните ваш GitHub токен как креденшнл в Jenkins
     }
 
     stages {
