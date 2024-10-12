@@ -48,7 +48,7 @@ def setGitHubStatus(String state, String description) {
     def owner = env.GIT_URL.tokenize('/')[env.GIT_URL.tokenize('/').size()-2]
     def apiUrl = "https://api.github.com/repos/${owner}/${repoName}/statuses/${commitSha}"
 
-    withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
+    withCredentials([string(credentialsId: 'github-web-hook', variable: 'GITHUB_TOKEN')]) {
         sh """curl -X POST ${apiUrl} \
               -H "Authorization: token ${GITHUB_TOKEN}" \
               -d '{"state": "${state}", "context": "CI Tests", "description": "${description}", "target_url": "${env.BUILD_URL}"}'"""
